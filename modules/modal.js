@@ -31,6 +31,9 @@ directive('bootstrapModal', function($defer) {
 			//Make escape close modal
 			if (hasEscapeExit === true)
 				jQuery('body').bind('keyup', escapeEvent);
+			
+			//Add modal-open class to body
+			jQuery('body').addClass('modal-open');
 
 			//Find all the children with class close, 
 			//and make them trigger close the modal on click
