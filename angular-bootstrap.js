@@ -1,9 +1,10 @@
-var module = angular.module('angularBootstrap', []);
+var module = angular.module('angularBootstrap', ['angularBootstrap.modal']);
 
 ///
 ///Modal
 ///
-module.directive('bootstrapModal', function($defer) {
+angular.module('angularBootstrap.modal', []).
+directive('bootstrapModal', function($defer) {
 	var link = function(scope, elm, attrs) {
 		var escapeEvent;
 		var openModal;
@@ -77,8 +78,8 @@ module.directive('bootstrapModal', function($defer) {
 		template: '<div id="{{modalId}}" class="modal hide"><div ng-transclude></div></div>',
 		transclude: true
 	};
-});
-module.directive('bootstrapModalOpen', function() {
+}).
+directive('bootstrapModalOpen', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, elm, attrs) {
