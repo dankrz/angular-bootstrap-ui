@@ -17,11 +17,11 @@ directive('bootstrapModal', function($defer) {
 				closeModal();
 		};
 
-		openModal = function(event, hasBackdrop, hasEscapeKey) {
+		openModal = function(event, hasBackdrop, hasEscapeExit) {
 			var modal = jQuery('#'+attrs.modalId);
 
 			//Make click on backdrop close modal
-			if (hasBackdrop) {
+			if (hasBackdrop === true) {
 				//If no backdrop el, have to add it
 				if (!document.getElementById('modal-backdrop')) {
 					jQuery('body').append(
