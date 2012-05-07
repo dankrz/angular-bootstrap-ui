@@ -1,0 +1,37 @@
+<!doctype html>
+<html ng-app="angularBootstrap">
+<head>
+	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
+	<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+	<script src="http://code.angularjs.org/1.0.0rc7/angular-1.0.0rc7.min.js"></script>
+	<script src="https://raw.github.com/ajoslin/angular-boostrap-ui/master/angular-bootstrap.js"></script>
+	<script src="https://raw.github.com/ajoslin/angular-boostrap-ui/master/modules/modal.js"></script>
+</head>
+<body>
+	<h1>angular-bootstrap-ui</h1>
+
+	<div class="container hero-unit">
+		<h3>Modals</h3>
+		<button class="btn" bootstrap-modal-open="aboutModal">Open (default)</button>
+		<button class="btn" bootstrap-modal-open="aboutModal" backdrop="false">Open (no backdrop)</button>
+	    <button class="btn" bootstrap-modal-open="aboutModal" escape-exit="false">Open (no escape key)</button>
+
+		<bootstrap-modal modal-id="aboutModal">
+			<div class="modal-header">
+				<button class="close">x</button>
+				<h3>About</h3>
+			</div>
+			<div class="modal-body">
+				<h3>This thing!</h3>
+				<ul>
+					<li>Is awesome</li>
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-primary close">Close</a>
+			</div>
+		</bootstrap-modal>
+	</div>
+</body>
+</html>
