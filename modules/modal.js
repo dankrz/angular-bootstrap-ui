@@ -1,6 +1,19 @@
 angular.module('angularBootstrap.modal', []).
 directive('bootstrapModal', function($defer) {
+
+	//Default opts
+	var defaults = {
+		hasBackdrop: true,
+		hasEscapeExit: true,
+		modalEffect: null,
+		effectTime: '250'
+	};
+	var opts = {};
+
 	var link = function(scope, elm, attrs) {
+		opts = angular.extend(defaults, attrs);
+		opts.effectTime = parseInt(opts.effectTime);
+
 		var escapeEvent;
 		var openModal;
 		var closeModal;
@@ -15,8 +28,13 @@ directive('bootstrapModal', function($defer) {
 		openModal = function(event, hasBackdrop, hasEscapeExit) {
 			var modal = jQuery('#'+attrs.modalId);
 
+			if (scope.modalOpen !== undefined && scope.modalOpen !== null)
+				scope.$apply(function() {
+					scope.modalOpen(attrs.modalId);
+				});
+
 			//Make click on backdrop close modal
-			if (hasBackdrop === true) {
+			if (opts.hasBackdrop === true) {
 				//If no backdrop el, have to add it
 				if (!document.getElementById('modal-backdrop')) {
 					jQuery('body').append(
@@ -24,12 +42,12 @@ directive('bootstrapModal', function($defer) {
 					);
 				}
 				jQuery('#modal-backdrop').
-					css({ display: 'block' }).
-					bind('click', closeModal);
+				css({ display: 'block' }).
+				bind('click', closeModal);
 			}
 
 			//Make escape close modal
-			if (hasEscapeExit === true)
+			if (opts.hasEscapeExit === true)
 				jQuery('body').bind('keyup', escapeEvent);
 			
 			//Add modal-open class to body
@@ -37,18 +55,30 @@ directive('bootstrapModal', function($defer) {
 
 			//Find all the children with class close, 
 			//and make them trigger close the modal on click
-			jQuery('.close', modal).bind('click', closeModal);
+			jQuery('.modal-close', modal).bind('click', closeModal);
 
+			//modal.css({ display: 'block' });
+			if (opts.modalEffect === 'fade') {
+				modal.fadeIn(opts.effectTime);
+			} else if (attrs.modalEffect === 'slide') {
+				modal.slideDown(opts.effectTime);
+			} else
 			modal.css({ display: 'block' });
 		};
 		
 		closeModal = function(event) {
+
+			if (scope.modalClose !== undefined && scope.modalClose !== null)
+				scope.$apply(function() {
+					scope.modalClose(attrs.modalId);
+				});
+
 			jQuery('#modal-backdrop').
-				unbind('click', closeModal).
-				css({ display: 'none' });
+			unbind('click', closeModal).
+			css({ display: 'none' });
 			jQuery('body').
-				unbind('keyup', escapeEvent).
-				removeClass('modal-open');
+			unbind('keyup', escapeEvent).
+			removeClass('modal-open');
 			jQuery('#'+attrs.modalId).css({ display: 'none' });
 		};
 
@@ -57,8 +87,8 @@ directive('bootstrapModal', function($defer) {
 		//so we will wait 100ms
 		$defer(function() {
 			jQuery('#'+attrs.modalId).
-				bind('modalOpen', openModal).
-				bind('modalClose', closeModal);
+			bind('modalOpen', openModal).
+			bind('modalClose', closeModal);
 		}, 100);
 	};
 
@@ -66,29 +96,27 @@ directive('bootstrapModal', function($defer) {
 		link: link,
 		restrict: 'E',
 		scope: {
-			modalId: 'attribute'
+			modalId: 'attribute',
+			modalOpen: 'evaluate'
 		},
 		template: '<div id="{{modalId}}" class="modal hide"><div ng-transclude></div></div>',
-		transclude: true
+		transclude: true,
+		replace: true
 	};
 }).
 directive('bootstrapModalOpen', function() {
-	return {
-		restrict: 'A',
-		link: function(scope, elm, attrs) {
+	return function(scope, elm, attrs) {
+		var hasBackdrop = attrs.backdrop === undefined ? true : attrs.backdrop;
+		var hasEscapeExit = attrs.escapeExit === undefined ? true : attrs.escapeExit;
 
-			var hasBackdrop = attrs.backdrop === undefined ? true : attrs.backdrop;
-			var hasEscapeExit = attrs.escapeExit === undefined ? true : attrs.escapeExit;
-
-			//Allow user to specify whether he wants it to open modal on click or what
-			//Defaults to click
-			var eventType = attrs.modalEvent === undefined ? 'click' : eventType;
-			
-			jQuery(elm).bind(eventType, function() {
-				jQuery('#'+attrs.bootstrapModalOpen).trigger(
-					'modalOpen', [hasBackdrop, hasEscapeExit]
-				);
-			});
-		}
-	};
+		//Allow user to specify whether he wants it to open modal on click or what
+		//Defaults to click
+		var eventType = attrs.modalEvent === undefined ? 'click' : eventType;
+		
+		jQuery(elm).bind(eventType, function() {
+			jQuery('#'+attrs.bootstrapModalOpen).trigger(
+				'modalOpen', [hasBackdrop, hasEscapeExit]
+			);
+		});
+	}
 });
