@@ -5,14 +5,16 @@
 	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
 	<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 	<script src="http://code.angularjs.org/1.0.0rc7/angular-1.0.0rc7.min.js"></script>
-	<script src="https://raw.github.com/ajoslin/angular-bootstrap-ui/master/angular-bootstrap.js"></script>
+	<script src="https://raw.github.com/ajoslin/angular-bootstrap-ui/master/modules/app.js"></script>
 	<script src="https://raw.github.com/ajoslin/angular-bootstrap-ui/master/modules/modal.js"></script>
+	<script src="https://raw.github.com/ajoslin/angular-bootstrap-ui/master/modules/tabs.js"></script>
 </head>
 <body>
 	<h1>angular-bootstrap-ui</h1>
-	<small>(this website is temporary, don't worry)</small>
+	<small>(this website is temporary, don't worry. To see how to use these, just view source for now)</small>
 
-	<div class="container hero-unit">
+	<!-- MODAL-->
+	<div class="container well">
 		<h3>Modals</h3>
 		<button class="btn" bootstrap-modal-open="aboutModal">Open (default)</button>
 		<button class="btn" bootstrap-modal-open="aboutModal" backdrop="false">Open (no backdrop)</button>
@@ -33,6 +35,47 @@
 				<a href="#" class="btn btn-primary modal-close">Close</a>
 			</div>
 		</bootstrap-modal>
+	</div>
+
+	<!-- BOOTSTRAP TABS -->
+	<script type="text/javascript">
+		function TabsCtrl($scope) {
+			$scope.things = [];
+			$scope.add = function() {
+				$scope.things.push({
+					thingTitle: "thing "+$scope.things.length,
+					date: new Date()
+				});
+			};
+			$scope.remove = function(item) {
+				$scope.things.splice( $scope.things.indexOf(item), 1 );
+			};
+			$scope.update = function(item) {
+				item.date = new Date();
+			};
+			$scope.onItemSel = function(item) {
+				$scope.lastSelectedItem = $scope.things.indexOf(item);
+			}
+		};
+	</script>
+	<script type="text/ng-template" id="tab-template">
+		<button class="btn" ng-click="parent.update(item)">Update</button>
+		<p>{{item.date}}</p>
+	</script>
+	<div class="container well" ng-controller="TabsCtrl">
+		<h3>Tabs</h3>
+		<button class="btn" ng-click="add()">New Tab</button>
+		<br />
+		<button class="btn btn-small" ng-repeat="thing in things" ng-click="remove(thing)">Remove {{thing}}</button>
+		<br />
+		<p>Last Selected Item: #{{lastSelectedItem}}</p>
+		<br /><br />
+		<bootstrap-tabs
+			items="things"
+			item-select="onItemSel"
+			item-title-attr="thingTitle"
+			item-template="tab-template">
+		</bootstrap-tabs>
 	</div>
 </body>
 </html>
