@@ -89,4 +89,4 @@ directive('bootstrapTabs', function() {
             '</div>'+
         '</div>'
     }
-});​
+});
