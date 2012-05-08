@@ -1,4 +1,4 @@
-angular.module('angularBootstrap.tabs').
+angular.module('angularBootstrap.tabs', []).
 directive('bootstrapTabs', function() {
     var defaults = {
         itemSelectedAttr: 'selected',
