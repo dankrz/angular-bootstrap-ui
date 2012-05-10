@@ -11,6 +11,78 @@
 </head>
 <body>
 	<h1>angular-bootstrap-ui</h1>
+	<h4>To view the code, just press view-source for now.  There's nothing better yet.</h4>
+	<hr />
+
+	<!-- MODAL-->
+	<div class="container well" ng-controller="ModalCtrl">
+		<h3>Modals</h3>
+		
+		<button class="btn btn-primary" ng-click="openModal()">Open Modal</button>
+		<br />
+		<br />
+		<div class="row-fluid">
+			<div class="span6">
+				<h5>Backdrop / Escape Exit</h5>
+				<input type="radio" ng-model="opts" value="both" /> Both<br />
+				<input type="radio" ng-model="opts" value="backdrop" /> Backdrop<br />
+				<input type="radio" ng-model="opts" value="escape" /> Escape Exit<br />
+			</div>
+			<div class="span6">
+				<h5>Effect</h5>
+				<input type="radio" ng-model="effect" value="" /> None</br >
+				<input type="radio" ng-model="effect" value="slide" /> Slide<br />
+				<input type="radio" ng-model="effect" value="fade" /> Fade<br />
+				<span ng-show="effect!=''">
+					<input type="text" class="input-small" ng-model="effectTime" /> Effect Time<br />
+				</span>
+			</div>
+		</div>
+
+		<bootstrap-modal id="aboutModal" effect='slide'>
+			<div class="modal-header">
+				<button class="close modal-close">x</button>
+				<h3>About</h3>
+			</div>
+			<div class="modal-body">
+				<h3>This thing!</h3>
+				<ul>
+					<li>Is awesome</li>
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-primary modal-close">Close</a>
+			</div>
+		</bootstrap-modal>
+	</div>
+
+	<!-- BOOTSTRAP TABS -->
+	<div ng-controller="TabsCtrl">
+		<script type="text/ng-template" id="tab-template">
+			<button class="btn" ng-click="parent.update(item)">Update</button>
+			<p>{{item.date}}</p>
+		</script>
+		<div class="container well">
+			<h3>Tabs</h3>
+			<button class="btn" ng-click="add()">New Tab</button>
+			<br />
+			<button class="btn btn-small" ng-repeat="thing in things" ng-click="remove(thing)">Remove {{thing.thingTitle}}</button><br />
+			<br />
+			<p>Last Selected Item: #{{lastSelectedItem}}</p>
+			<br /><br />
+			<bootstrap-tabs
+				items="things"
+				item-select="onItemSel"
+				item-title-attr="thingTitle"
+				item-template="tab-template">
+			</bootstrap-tabs>
+		</div>
+	</div>
+</body>
+</html>
+
+<body>
+	<h1>angular-bootstrap-ui</h1>
 	<small>(this website is temporary, don't worry. To see how to use these, just view source for now)</small>
 
 	<!-- MODAL-->
