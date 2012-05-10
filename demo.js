@@ -5,13 +5,12 @@ function ModalCtrl($scope, bootstrapModal) {
 	$scope.effectTime = "250";
 
 	$scope.openModal = function() {
-		bootstrapModal.show(
-			'aboutModal', 
-			$scope.opts == "both" || $scope.opts == "backdrop",
-			$scope.opts == "both" || $scope.opts == "escape",
-			$scope.effect, 
-			parseInt( $scope.effectTime )
-		);
+		bootstrapModal.show('aboutModal', 
+		{	backdrop: $scope.opts == "both" || $scope.opts == "backdrop",
+			escapeExit: $scope.opts == "both" || $scope.opts == "escape",
+			effect: $scope.effect, 
+			effectTime: parseInt( $scope.effectTime )
+		});
 	};
 };
 
