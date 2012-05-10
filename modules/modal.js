@@ -33,7 +33,7 @@ angular.module('angularBootstrap.modal', [])
 			var modalElm = jQuery('.modal', element);
 
 			//Fall back on directive options for parameters not given
-			options = angular.extend(options, directiveOpts);
+			options = angular.extend(directiveOpts, options);
 
 			//Assign currentEffect object so closeModal knows the effect
 			currentEffect = { effect: options.effect, time: options.effectTime };
@@ -125,7 +125,7 @@ angular.module('angularBootstrap.modal', [])
 			jQuery('#'+modalId).trigger('modalOpen', [options]);
 		},
 		hide: function(modalId) {
-			jQuery('#'+modalId).trigger('hideClose');
+			jQuery('#'+modalId).trigger('modalClose');
 		}
 	}
 });
