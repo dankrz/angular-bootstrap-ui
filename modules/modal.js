@@ -1,122 +1,133 @@
-angular.module('angularBootstrap.modal', []).
-directive('bootstrapModal', function($defer) {
+angular.module('angularBootstrap.modal', [])
+.directive('bootstrapModal', function($rootScope) {
+
+	var escapeEvent, openEvent, closeEvent, linkFn;
 
 	//Default opts
 	var defaults = {
-		hasBackdrop: true,
-		hasEscapeExit: true,
-		modalEffect: null,
-		effectTime: '250'
+		backdrop: true,
+		escapeExit: true,
+		effect: null,
+		effectTime: '250',
 	};
-	var opts = {};
 
-	var link = function(scope, elm, attrs) {
-		opts = angular.extend(defaults, attrs);
+	linkFn = function(scope, element, attrs) {
+		//So when a modal is opened with an effect, it knows what to close it with
+		var currentEffect = {};
+
+		var opts = angular.extend(defaults, attrs);
 		opts.effectTime = parseInt(opts.effectTime);
-
-		var escapeEvent;
-		var openModal;
-		var closeModal;
 
 		//Escape event has to be declared so that when modal closes,
 		//we only unbind modal escape and not everything
 		escapeEvent = function(e) {
-			if (e.which == 27)
-				closeModal();
+			if (e.which == 27) 
+				closeEvent();
 		};
 
-		openModal = function(event, hasBackdrop, hasEscapeExit) {
-			var modal = jQuery('#'+attrs.modalId);
+		//Opens the modal
+		openEvent = function(event, backdrop, escapeExit, effect, effectTime) {
+			var modalTop; //for slide effect
 
-			if (scope.modalOpen !== undefined && scope.modalOpen !== null)
-				scope.$apply(function() {
-					scope.modalOpen(attrs.modalId);
+			//.modal child of the bootstrap-modal element is the actual div we want to control
+			var modalElm = jQuery('.modal', element);
+
+			//Fall back on options for parameters not given
+			backdrop = backdrop === undefined ? opts.backdrop : backdrop;
+			escapeExit = escapeExit === undefined ? opts.escapeExit : escapeExit;
+			effect = effect === undefined ? opts.effect : effect;
+			effectTime = effectTime === undefined ? opts.effectTime : effectTime
+
+			currentEffect = { effect: effect, time: effectTime };
+
+			//If there's an on-open attribute, call the function
+			if (scope.onOpen !== undefined && scope.onOpen !== null)
+				$rootScope.$apply(function() { 
+					scope.onOpen(attrs.id);
 				});
 
 			//Make click on backdrop close modal
-			if (opts.hasBackdrop === true) {
+			if (backdrop === true || backdrop === "true") {
 				//If no backdrop el, have to add it
-				if (!document.getElementById('modal-backdrop')) {
-					jQuery('body').append(
-						'<div id="modal-backdrop" class="modal-backdrop"></div>'
-					);
-				}
-				jQuery('#modal-backdrop').
-				css({ display: 'block' }).
-				bind('click', closeModal);
+				if (!document.getElementById('modal-backdrop'))
+					jQuery('body').append('<div id="modal-backdrop" class="modal-backdrop"></div>')
+				jQuery('#modal-backdrop')
+					.css({ display: 'block' })
+					.bind('click', closeEvent);
 			}
-
-			//Make escape close modal
-			if (opts.hasEscapeExit === true)
+			//Make escape close modal unless set otherwise
+			if (escapeExit === true || escapeExit === "true")
 				jQuery('body').bind('keyup', escapeEvent);
 			
-			//Add modal-open class to body
 			jQuery('body').addClass('modal-open');
+			jQuery('.modal-close', modalElm).bind('click', closeEvent);
 
-			//Find all the children with class close, 
-			//and make them trigger close the modal on click
-			jQuery('.modal-close', modal).bind('click', closeModal);
-
-			//modal.css({ display: 'block' });
-			if (opts.modalEffect === 'fade') {
-				modal.fadeIn(opts.effectTime);
-			} else if (attrs.modalEffect === 'slide') {
-				modal.slideDown(opts.effectTime);
-			} else
-			modal.css({ display: 'block' });
+			if (currentEffect.effect === 'fade') {
+				modalElm.fadeIn(currentEffect.time);
+				
+			} else if (currentEffect.effect === 'slide') {
+				//Slide modal from top. have to hide it at top first
+				modalTop = modalElm.css('top')
+				modalElm.css({ top: '-30%', display: 'block' })
+					.animate({ top: modalTop }, currentEffect.time)
+			} else {
+				modalElm.css({ display: 'block' });
+			}
 		};
 		
-		closeModal = function(event) {
+		//Closes the modal
+		closeEvent = function(event) {
+			//.modal child of the bootstrap-modal element is the actual div we want to control
+			var modalElm = jQuery('.modal', element);
+			var modalTop; //for slide
 
-			if (scope.modalClose !== undefined && scope.modalClose !== null)
-				scope.$apply(function() {
-					scope.modalClose(attrs.modalId);
+			//Call onClose function if it was set
+			if (scope.onClose !== undefined && scope.onClose !== null)
+				$rootScope.$apply(function() {
+					scope.onClose(attrs.id);
 				});
 
-			jQuery('#modal-backdrop').
-			unbind('click', closeModal).
-			css({ display: 'none' });
-			jQuery('body').
-			unbind('keyup', escapeEvent).
-			removeClass('modal-open');
-			jQuery('#'+attrs.modalId).css({ display: 'none' });
+			if (currentEffect.effect === 'fade') {
+				modalElm.fadeOut(currentEffect.time, function() {
+					modalElm.css({ display: 'none' });
+				});
+			} else if (currentEffect.effect === 'slide') {
+				modalTop = modalElm.css('top');
+				modalElm.animate({ top: '-30%' }, currentEffect.time, function() {
+					modalElm.css({ display: 'none', top: modalTop });
+				});
+			} else {
+				modalElm.css({ display: 'none' });
+			}
+
+			jQuery('#modal-backdrop').unbind('click', closeEvent).css({ display: 'none' });
+			jQuery('body').unbind('keyup', escapeEvent).removeClass('modal-open');
 		};
 
-		//Bind modalOpen and modalClose events, so outsiders can trigger it
-		//We have to wait until the template has been fully put in to do this,
-		//so we will wait 100ms
-		$defer(function() {
-			jQuery('#'+attrs.modalId).
-			bind('modalOpen', openModal).
-			bind('modalClose', closeModal);
-		}, 100);
-	};
+		//Bind modalOpen and modalClose events, so outsiders can trigger the modal
+		element.bind('modalOpen', openEvent).bind('modalClose', closeEvent);
+
+	}
 
 	return {
-		link: link,
+		link: linkFn,
 		restrict: 'E',
 		scope: {
-			modalId: 'attribute',
-			modalOpen: 'evaluate'
+			id: 'attribute',
+			onOpen: 'evaluate',
+			onClose: 'evaluate',
 		},
-		template: '<div id="{{modalId}}" class="modal hide"><div ng-transclude></div></div>',
-		transclude: true,
-		replace: true
+		template: '<div class="modal hide"><div ng-transclude></div></div>',
+		transclude: true
 	};
-}).
-directive('bootstrapModalOpen', function() {
-	return function(scope, elm, attrs) {
-		var hasBackdrop = attrs.backdrop === undefined ? true : attrs.backdrop;
-		var hasEscapeExit = attrs.escapeExit === undefined ? true : attrs.escapeExit;
-
-		//Allow user to specify whether he wants it to open modal on click or what
-		//Defaults to click
-		var eventType = attrs.modalEvent === undefined ? 'click' : eventType;
-		
-		jQuery(elm).bind(eventType, function() {
-			jQuery('#'+attrs.bootstrapModalOpen).trigger(
-				'modalOpen', [hasBackdrop, hasEscapeExit]
-			);
-		});
+})
+.factory('bootstrapModal', function() {
+	return {
+		show: function(modalId, backdrop, escapeExit, effect, effectTime) {
+			jQuery('#'+modalId).trigger('modalOpen', [backdrop, escapeExit, effect, effectTime]);
+		},
+		hide: function(modalId) {
+			jQuery('#'+modalId).trigger('hideClose');
+		}
 	}
 });
