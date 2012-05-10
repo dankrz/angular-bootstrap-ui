@@ -36,7 +36,7 @@ angular.module('angularBootstrap.modal', [])
 			options = angular.extend(options, directiveOpts);
 
 			//Assign currentEffect object so closeModal knows the effect
-			currentEffect = { effect: options.effect, time: effectTime };
+			currentEffect = { effect: options.effect, time: options.effectTime };
 
 			//If there's an on-open attribute, call the function
 			if (scope.onOpen !== undefined && scope.onOpen !== null)
