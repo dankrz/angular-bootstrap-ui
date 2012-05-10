@@ -3,7 +3,7 @@ angular.module('angularBootstrap.modal', [])
 
 	var escapeEvent, openEvent, closeEvent, linkFn;
 
-	//Default opts
+	//Default directiveOpts
 	var defaults = {
 		backdrop: true,
 		escapeExit: true,
@@ -15,8 +15,8 @@ angular.module('angularBootstrap.modal', [])
 		//So when a modal is opened with an effect, it knows what to close it with
 		var currentEffect = {};
 
-		var opts = angular.extend(defaults, attrs);
-		opts.effectTime = parseInt(opts.effectTime);
+		var directiveOpts = angular.extend(defaults, attrs);
+		directiveOpts.effectTime = parseInt(directiveOpts.effectTime);
 
 		//Escape event has to be declared so that when modal closes,
 		//we only unbind modal escape and not everything
@@ -26,19 +26,17 @@ angular.module('angularBootstrap.modal', [])
 		};
 
 		//Opens the modal
-		openEvent = function(event, backdrop, escapeExit, effect, effectTime) {
+		openEvent = function(event, options) {
 			var modalTop; //for slide effect
 
 			//.modal child of the bootstrap-modal element is the actual div we want to control
 			var modalElm = jQuery('.modal', element);
 
-			//Fall back on options for parameters not given
-			backdrop = backdrop === undefined ? opts.backdrop : backdrop;
-			escapeExit = escapeExit === undefined ? opts.escapeExit : escapeExit;
-			effect = effect === undefined ? opts.effect : effect;
-			effectTime = effectTime === undefined ? opts.effectTime : effectTime
+			//Fall back on directive options for parameters not given
+			options = angular.extend(options, directiveOpts);
 
-			currentEffect = { effect: effect, time: effectTime };
+			//Assign currentEffect object so closeModal knows the effect
+			currentEffect = { effect: options.effect, options.time: effectTime };
 
 			//If there's an on-open attribute, call the function
 			if (scope.onOpen !== undefined && scope.onOpen !== null)
@@ -47,7 +45,7 @@ angular.module('angularBootstrap.modal', [])
 				});
 
 			//Make click on backdrop close modal
-			if (backdrop === true || backdrop === "true") {
+			if (options.backdrop === true || options.backdrop === "true") {
 				//If no backdrop el, have to add it
 				if (!document.getElementById('modal-backdrop'))
 					jQuery('body').append('<div id="modal-backdrop" class="modal-backdrop"></div>')
@@ -56,7 +54,7 @@ angular.module('angularBootstrap.modal', [])
 					.bind('click', closeEvent);
 			}
 			//Make escape close modal unless set otherwise
-			if (escapeExit === true || escapeExit === "true")
+			if (options.escapeExit === true || options.escapeExit === "true")
 				jQuery('body').bind('keyup', escapeEvent);
 			
 			jQuery('body').addClass('modal-open');
@@ -123,8 +121,8 @@ angular.module('angularBootstrap.modal', [])
 })
 .factory('bootstrapModal', function() {
 	return {
-		show: function(modalId, backdrop, escapeExit, effect, effectTime) {
-			jQuery('#'+modalId).trigger('modalOpen', [backdrop, escapeExit, effect, effectTime]);
+		show: function(modalId, options) {
+			jQuery('#'+modalId).trigger('modalOpen', [options]);
 		},
 		hide: function(modalId) {
 			jQuery('#'+modalId).trigger('hideClose');
