@@ -33,7 +33,7 @@ angular.module('angularBootstrap.modal', [])
 			var modalElm = jQuery('.modal', element);
 
 			//Fall back on directive options for parameters not given
-			options = angular.extend(directiveOpts, options);
+			options = angular.extend(directiveOpts, options || {});
 
 			//Assign currentEffect object so closeModal knows the effect
 			currentEffect = { effect: options.effect, time: options.effectTime };
