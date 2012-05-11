@@ -59,7 +59,6 @@ directive('bootstrapTabs', function() {
     }
 
     return {
-        link: linkFn,
         controller: controllerFn,
         scope: {
             items: 'accessor',
