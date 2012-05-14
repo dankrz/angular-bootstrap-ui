@@ -6,7 +6,7 @@ directive('bootstrapTabs', function() {
     };
 
     var controllerFn = function($scope, $element, $attrs) {
-        var opts = angular.extend(defaults, attrs);
+        var opts = angular.extend(defaults, $attrs);
 
         //Have to watch items().length. If we just watch items(), 
         //the watch will never actually trigger itself        
