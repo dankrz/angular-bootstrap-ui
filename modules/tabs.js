@@ -2,17 +2,11 @@ angular.module('angularBootstrap.tabs', []).
 directive('bootstrapTabs', function() {
     var defaults = {
         itemSelectedAttr: 'selected',
-        itemTitleAttr: 'title',
-        itemSelect: ''
-    };
-
-    var opts={};
-
-    var linkFn = function(scope, elm, attrs) {
-        opts = angular.extend(defaults, attrs);
+        itemTitleAttr: 'title'
     };
 
     var controllerFn = function($scope, $element, $attrs) {
+        var opts = angular.extend(defaults, attrs);
 
         //Have to watch items().length. If we just watch items(), 
         //the watch will never actually trigger itself        
@@ -65,7 +59,6 @@ directive('bootstrapTabs', function() {
     }
 
     return {
-        link: linkFn,
         controller: controllerFn,
         scope: {
             items: 'accessor',
